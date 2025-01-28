@@ -287,7 +287,7 @@ void contact_page(cWS *server, cWR* req, WebRoute *route, int socket) {
                                 &(Control){ .Tag = P_TAG, .Class = "box_txt", .Text = "Subject:" },
                                 &(Control){ .Tag = INPUT_TAG, .ID = "email_subject", .Type = "text", .Class = "txtbox", .Data = "name=\"email_subject\" placeholder=\"Subject\"" },
                                 &(Control){ .Tag = P_TAG, .Class = "box_txt", .Text = "Message:" },
-                                &(Control){ .Tag = INPUT_TAG, .ID = "email_msg", .Type = "text", .Class = "txtbox", .Data = "name=\"email_msg\" placeholder=\"Message\"" },
+                                &(Control){ .Tag = INPUT_TAG, .ID = "email_msg", .Type = "text", .Class = "txtbox", .CSS = (char *[]){"height: 50px", NULL}, .Data = "name=\"email_msg\" placeholder=\"Message\"" },
                                 &(Control){ .Tag = INPUT_TAG, .Type = "submit", .ID = "submit_email", .Data = "name=\"submit_email\" value=\"Send Email\"", .Class = "email_btn" },
                                 &(Control){ .Tag = P_TAG, .ID = "results", .Class = "box_txt", .Data = "name=\"results\"" },
                                 NULL
@@ -300,24 +300,25 @@ void contact_page(cWS *server, cWR* req, WebRoute *route, int socket) {
         String Email = {0}, Subject = {0}, Message = {0};
         CONTACT_RESULTS.Clear(&CONTACT_RESULTS);
 
-        if(req->Headers.InMap(&req->Headers, "submit_email")) {
+        if(req->Headers.Get(&req->Headers, "submit_email")) {
                 for(int i = 0; i < req->Headers.idx; i++) {
                         if(strstr(((Key *)req->Headers.arr[i])->key, "from_email"))
-                                Email = NewString(((Key *)req->Headers.arr[i])->key);
+                                Email = NewString(((Key *)req->Headers.arr[i])->value);
 
                         if(strstr(((Key *)req->Headers.arr[i])->key, "email_subject"))
-                                Subject = NewString(((Key *)req->Headers.arr[i])->key);
+                                Subject = NewString(((Key *)req->Headers.arr[i])->value);
 
                         if(strstr(((Key *)req->Headers.arr[i])->key, "email_msg"))
-                                Message = NewString(((Key *)req->Headers.arr[i])->key);
+                                Message = NewString(((Key *)req->Headers.arr[i])->value);
                 }
-        }
 
-        if(Email.idx == 0 || Subject.idx == 0 || Message.idx == 0)
-        {
-                CONTACT_RESULTS.AppendString(&CONTACT_RESULTS, "You must fill out the form!");
-        } else {
-                CONTACT_RESULTS.AppendString(&CONTACT_RESULTS, "Email Send, You shall recieve an email within 48 hours!");
+                if(Email.idx == 0 || Subject.idx == 0 || Message.idx == 0)
+                {
+                        CONTACT_RESULTS.AppendString(&CONTACT_RESULTS, "You must fill out the form!");
+                } else {
+                        printf("Email: %s | Subject: %s | Message: %s\n", Email.data, Subject.data, Message.data);
+                        CONTACT_RESULTS.AppendString(&CONTACT_RESULTS, "Email Send, You shall recieve an email within 48 hours!");
+                }
         }
         ((Control *)((Control *)((Control *)body.SubControls[2])->SubControls[1])->SubControls[8])->Text = CONTACT_RESULTS.data;
 
