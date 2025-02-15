@@ -7,47 +7,34 @@
 #include <map.h>
 #include <Net/web.h>
 
-Map headers = {0};
 /* CreateControl Test */
 
 void indexp(cWS *server, cWS *req, WebRoute *route, int sock) {
-    CSS TextColor = (CSS){ .Class = "txt_color", .Selector = 1, .Data = (char *[]){
-        "color: #ff0000",
-        NULL
-    }};
-
     Control *Head = CreateControl(HEAD_TAG, NULL, NULL, NULL, (Control *[]){
         CreateControl(TITLE_TAG, NULL, NULL, "Hi", NULL),
         NULL
     });
 
     Control *Body = CreateControl(BODY_TAG, NULL, NULL, NULL , (Control *[]){
-        CreateControl(P_TAG, TextColor.Class, NULL, "Hello World", NULL),
+        CreateControl(P_TAG, NULL, NULL, "Hello World", NULL),
         NULL
     });
 
-    route->ConstructCHT(route, (Control *[]){Head, Body, NULL}, (CSS *[]){&TextColor, NULL});
+    route->Controls = (Control *[]){Head, Body, NULL};
+    int chk = ConstructTemplate(route, (Control *[]){Head, Body, NULL}, NULL);
+    Map headers = NewMap();
+    headers.Append(&headers, "Content-Type", "text/html;charset=UTF-8");
+    headers.Append(&headers, "Connection", "close");
+
     SendResponse(server, sock, OK, headers, ((Map){}), route->Template);
 }
 
 int main() {
-    /* Set Default headers */
-    headers = NewMap();
-    headers.Append(&headers, "Content-Type", "text/html;charset=UTF-8");
-    headers.Append(&headers, "Connection", "close");
-
-    /* Initialize Webserver */
-    cWS *server = StartWebServer(NewString(""), 50, 0);
+    cWS *server = StartWebServer(NewString(""), 80, 0);
     if(!server)
         return 1;
 
-    /* Add a route */
-    server->AddRoutes(server, (WebRoute *[]){
-        CreateRoute("index", "/", indexp),
-        NULL
-    });
-
-    /* Run the web server in background */
+    server->AddRoute(server, (WebRoute){ .Name = "index", .Path = "/", .Handler = indexp });
     server->Run(server, 999, 0);
 
     char BUFF[10];

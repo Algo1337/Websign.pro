@@ -37,7 +37,5 @@ int main() {
 
     char BUFFER[100];
     fgets(BUFFER, 100, stdin);
-
-    server->Destruct(server);
     return 0;
 }
