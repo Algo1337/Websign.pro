@@ -109,6 +109,11 @@ CSS *UserDashboardCSS[] = (CSS *[]){
     &UserBoxTxt,
     &EditAccBtn,
     &RightSideBar,
+    &DashLogBox,
+    &centered_box,
+    &LogDisplay,
+    &LogItem,
+    &StatisticDisplay,
     NULL
 };
 
@@ -472,6 +477,22 @@ Control UserDashboard = { .Tag = BODY_TAG, .CSS = (char *[]){"background-color: 
         &(Control){ .Tag = DIV_TAG, .Class = "side_bar_opt", .Text = "Orders" },
         &(Control){ .Tag = DIV_TAG, .Class = "side_bar_opt", .Text = "Invoices" },
         &(Control){ .Tag = DIV_TAG, .Class = "side_bar_opt", .Text = "Settings" },
+        NULL
+    }},
+    &(Control){ .Tag = H3_TAG, .CSS = (char *[]){"color: #fff;", "margin-left: 210px;", NULL}, .Text = "Unpaid Orders" },
+    &(Control){ .Tag = DIV_TAG, .Class = "log_display", .SubControlCount = 4, .SubControls = (void *[]){
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Order #" },
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Product" },
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Total Cost" },
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Invoice Status" },
+        NULL
+    }},
+    &(Control){ .Tag = H3_TAG, .CSS = (char *[]){"color: #fff;", "margin-left: 210px;", NULL}, .Text = "Unpaid Invoices" },
+    &(Control){ .Tag = DIV_TAG, .Class = "log_display", .SubControlCount = 4, .SubControls = (void *[]){
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Order #" },
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Product" },
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Total Cost" },
+        &(Control){ .Tag = DIV_TAG, .Class = "log_item", .Text = "Invoice Status" },
         NULL
     }},
     NULL

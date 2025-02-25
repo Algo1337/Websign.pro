@@ -8,7 +8,6 @@
 #include "algo.h"
 
 String IP_ADDR = {0};
-Map DefaultHeaders;
 
 int main() {
     ContactBuffer = NewString(NULL);
@@ -37,5 +36,7 @@ int main() {
 
     char BUFFER[100];
     fgets(BUFFER, 100, stdin);
+
+    // server->Destruct(server);
     return 0;
 }

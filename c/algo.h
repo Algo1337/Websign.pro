@@ -61,6 +61,10 @@ extern CSS UserBoxTxt;
 extern CSS EditAccBtn;
 extern CSS RightSideBar;
 extern CSS ServiceDisplay;
+extern CSS DashLogBox;
+extern CSS LogDisplay;
+extern CSS LogItem;
+extern CSS StatisticDisplay;
 
 // == [ global_cht.c ] ==
 extern Control HeadControl;

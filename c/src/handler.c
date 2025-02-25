@@ -14,20 +14,6 @@ void SetupHeaders() {
     Headers.Append(&Headers, "Connection", "close");
 }
 
-char *GetSocketIP(int sock) {
-    struct sockaddr_in addr;
-    socklen_t addr_len = sizeof(addr);
-
-    if (getpeername(sock, (struct sockaddr *)&addr, &addr_len) == -1)
-        return NULL;
-
-    char client_ip[INET_ADDRSTRLEN] = {0};
-    if (inet_ntop(AF_INET, &addr.sin_addr, client_ip, sizeof(client_ip)) == NULL)
-        return NULL;
-
-    return strdup(client_ip);
-}
-
 char *FindKey(Map *m, const char *key) {
     if(!m || !m->arr)
         return NULL;
@@ -82,16 +68,15 @@ void ContactFormHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
     if(((Control *)((Control *)((Control *)ContactForm.SubControls[2])->SubControls[1])->SubControls[8])->Text != ContactBuffer.data)
         ((Control *)((Control *)((Control *)ContactForm.SubControls[2])->SubControls[1])->SubControls[8])->Text = ContactBuffer.data;
 
-    int check = ConstructTemplate(route, (Control *[]){&HeadControl, &ContactForm, NULL}, ContactCSS);
-    if(!check)
-        printf("[ - ] Error %d, Unable to build template....\n", check);
+    char *template = route->ConstructCHT((Control *[]){&HeadControl, &ContactForm, NULL}, ContactCSS);
+    if(!template)
+        printf("[ - ] Error, Unable to build template....\n");
 
-    SendResponse(server, socket, OK, Headers, ((Map){}), route->Template);
+    SendResponse(server, socket, OK, Headers, ((Map){0}), ((Map){}), template);
+    free(template);
 }
 
 void RouteHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
-    char *user_ip = GetSocketIP(socket);
-
     char *chk = NULL;
     for(int i = 0; i < req->Headers.idx; i++) {
         if(!req->Headers.arr[i])
@@ -102,9 +87,9 @@ void RouteHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
     }
 
     if(chk)
-        printf("Sock IP: %s | CF IP: %s\n", user_ip, chk);
+        printf("Sock IP: %s | CF IP: %s\n", req->ClientIP, chk);
     else
-        printf("Sock IP: %s | Unable to find Client IP through Cloudflare....!\n", user_ip);
+        printf("Sock IP: %s | Unable to find Client IP through Cloudflare....!\n", req->ClientIP);
     
     Control **Controls;
     CSS **Style;
@@ -124,9 +109,11 @@ void RouteHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
         Controls = (Control *[]){&HeadControl, &Store, NULL};
         Style = StoreCSS;
     } else { route->Template = "Err404"; }
-    int check = ConstructTemplate(route, Controls, Style);
-    if(check <= 0)
+
+    char *template = route->ConstructCHT(Controls, Style);
+    if(!template)
         printf("[ - ] Unable to construct template....!\n");
 
-    SendResponse(server, socket, OK, Headers, ((Map){}), route->Template);
+    SendResponse(server, socket, OK, Headers, ((Map){0}), ((Map){0}), template);
+    free(template);
 }

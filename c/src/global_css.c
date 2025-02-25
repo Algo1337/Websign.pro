@@ -343,3 +343,47 @@ CSS ServiceDisplay = (CSS){ .Class = "service_display", .Selector = 1, .Data = (
     "display: inline-block",
     NULL
 }};
+
+CSS DashLogBox = (CSS){ .Class = "dash_log_box", .Selector = 1, .Data = (char *[]){
+    "background-color: #fff",
+    "margin: auto",
+    "top: 50%",
+    "left: 50%",
+    "margin-top: 50px",
+    "width: 250px",
+    "height: 600px",
+    "display: inline-block",
+    NULL
+}};
+
+CSS LogDisplay = (CSS){ .Class = "log_display", .Selector = 1, .Data = (char *[]){
+    "border: 2px solid white",
+    "border-radius: 15px",
+    "margin: auto",
+    "top: 0",
+    "left: 0",
+    "margin-top: 10px",
+    "margin-left: 210px",
+    "width: 700px",
+    "padding-bottom: 10px",
+    "display: grid",
+    "gap: 10px",
+    "grid-template-columns: 150px 150px 150px 150px",
+    NULL
+}};
+
+
+CSS StatisticDisplay = (CSS){ .Class = "statistic_display", .Selector = 1, .Data = (char *[]){
+    "width: 200px",
+    "height: 300px",
+    "margin-left: 15px",
+    "border-radius: 15px",
+    NULL
+}};
+
+CSS LogItem = (CSS){ .Class = "log_item", .Selector = 1, .Data = (char *[]){
+    "padding-left: 5px",
+    "width: 150px",
+    "height: 30px",
+    NULL
+}};
