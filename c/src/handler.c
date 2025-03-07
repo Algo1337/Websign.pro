@@ -33,27 +33,20 @@ char *FindKey(Map *m, const char *key) {
 }
 
 void ContactFormHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
-    char *n = FindKey(&req->Queries, "submit_email");
-    char *from = FindKey(&req->Queries, "from_email");
-    char *subj = FindKey(&req->Queries, "email_subject");
-    char *msg = FindKey(&req->Queries, "email_msg");
+    char *n = decode_input_symbols(FindKey(&req->Queries, "submit_email"));
+    char *from = decode_input_symbols(FindKey(&req->Queries, "from_email"));
+    char *subj = decode_input_symbols(FindKey(&req->Queries, "email_subject"));
+    char *msg = decode_input_symbols(FindKey(&req->Queries, "email_msg"));
     
     if((!n || !from) && req->RequestType.Is(&req->RequestType, "POST") && !req->Body.Contains(&req->Body, "submit_email")) {
         printf("Retrieving the rest of the POST data....!\n");
 
-        char *BUFFER = (char *)calloc(4096, sizeof(char));
-        int bytes = read(socket, BUFFER, 4096);
-        BUFFER[bytes] = '\0';
+        fetch_cf_post_data(server, req, socket);
 
-        req->Body.Clear(&req->Body);
-        req->Body.Set(&req->Body, BUFFER);
-        GetPostQueries(server, req);
-
-        n = FindKey(&req->Queries, "submit_email");
-        from = FindKey(&req->Queries, "from_email");
-        subj = FindKey(&req->Queries, "email_subject");
-        msg = FindKey(&req->Queries, "email_msg");
-        free(BUFFER);
+        n = decode_input_symbols(FindKey(&req->Queries, "submit_email"));
+        from = decode_input_symbols(FindKey(&req->Queries, "from_email"));
+        subj = decode_input_symbols(FindKey(&req->Queries, "email_subject"));
+        msg = decode_input_symbols(FindKey(&req->Queries, "email_msg"));
     }
 
 
@@ -65,8 +58,9 @@ void ContactFormHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
     }
 
     // Ensure to set this buffer if it isnt already set
-    if(((Control *)((Control *)((Control *)ContactForm.SubControls[2])->SubControls[1])->SubControls[8])->Text != ContactBuffer.data)
-        ((Control *)((Control *)((Control *)ContactForm.SubControls[2])->SubControls[1])->SubControls[8])->Text = ContactBuffer.data;
+    Control *ContactBody =  stack_to_heap(ContactForm);
+    if(((Control *)((Control *)((Control *)ContactBody->SubControls[2])->SubControls[1])->SubControls[8])->Text != ContactBuffer.data)
+        ((Control *)((Control *)((Control *)ContactBody->SubControls[2])->SubControls[1])->SubControls[8])->Text = ContactBuffer.data;
 
     char *template = route->ConstructCHT((Control *[]){&HeadControl, &ContactForm, NULL}, ContactCSS);
     if(!template)
@@ -74,6 +68,12 @@ void ContactFormHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
 
     SendResponse(server, socket, OK, Headers, ((Map){0}), ((Map){}), template);
     free(template);
+
+
+	if(ContactBody->SubControlCount > 3)
+        DestructControls(ContactBody);
+    
+    ContactBuffer.Clear(&ContactBuffer);
 }
 
 void RouteHandler(cWS *server, cWR *req, WebRoute *route, int socket) {
